@@ -11,6 +11,10 @@ type Config struct {
 		// Infura http url
 		InfuraURL string `yaml:"infura_url"`
 	} `yaml:"eth"`
+	Server struct {
+		Host string `yaml:"host"`
+		Port string `yaml:"port"`
+	} `yaml:"server"`
 }
 
 // NewConfig returns a new decoded Config struct
