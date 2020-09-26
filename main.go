@@ -2,20 +2,13 @@ package main
 
 import (
 	"ens_feed/config"
-	"io"
+	"ens_feed/server"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gorilla/mux"
 )
-
-func hello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "Hello world!")
-}
 
 func main() {
 	log.SetFlags(log.Flags() | log.Lmicroseconds | log.Lshortfile)
@@ -37,24 +30,10 @@ func main() {
 	log.Println("Eth connection ready")
 	_ = client
 
-	// run http server
-	router := mux.NewRouter()
-	router.HandleFunc("/", hello).Methods(http.MethodGet)
-
-	addr := cfg.Server.Host + ":" + cfg.Server.Port
-	srv := &http.Server{
-		Handler: router,
-		Addr:    addr,
-
-		// Good practice: enforce timeouts for servers
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-		IdleTimeout:  60 * time.Second,
-	}
-
+	srv := server.NewServer(cfg.Server.Host, cfg.Server.Port)
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		log.Println("Starting http server")
+		log.Println("Starting http server..")
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
