@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"ens_feed/eth"
 	"log"
 	"net/http"
 	"time"
@@ -9,16 +10,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// NewServer creates and returns http server
-func NewServer(host, port string) *http.Server {
-	router := mux.NewRouter()
+type api struct {
+	ens *eth.NameService
+}
 
-	router.Use(loggingMiddleware)
-	router.HandleFunc("/hello", hello).Methods(http.MethodGet)
+// NewServer creates and returns http server with api handlers
+func NewServer(host, port string, ens *eth.NameService) *http.Server {
+	a := &api{ens: ens}
+	handlers := newRouter(a)
 
 	addr := host + ":" + port
 	return &http.Server{
-		Handler: router,
+		Handler: handlers,
 		Addr:    addr,
 
 		// Good practice: enforce timeouts for servers
@@ -26,6 +29,15 @@ func NewServer(host, port string) *http.Server {
 		ReadTimeout:  15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
+}
+
+func newRouter(a *api) http.Handler {
+	router := mux.NewRouter()
+
+	router.Use(loggingMiddleware)
+	router.HandleFunc("/test", a.test).Methods(http.MethodGet)
+
+	return router
 }
 
 func loggingMiddleware(inner http.Handler) http.Handler {
@@ -37,14 +49,22 @@ func loggingMiddleware(inner http.Handler) http.Handler {
 }
 
 // test handler
-func hello(w http.ResponseWriter, r *http.Request) {
+func (a *api) test(w http.ResponseWriter, r *http.Request) {
 	type hello struct {
-		Msg string `json:"msg"`
+		Msg     string `json:"msg"`
+		TestENS string `json:"test_ens"`
+	}
+	addr, err := a.ens.ResolveTest()
+	if err != nil {
+		respondWithJSON(w, http.StatusBadRequest, err)
 	}
 
-	respondWithJSON(w, http.StatusOK, hello{Msg: "hello"})
+	h := hello{Msg: "test ens", TestENS: addr}
+
+	respondWithJSON(w, http.StatusOK, h)
 }
 
+// helper
 func respondWithJSON(w http.ResponseWriter, status int, object interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 
