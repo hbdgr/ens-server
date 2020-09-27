@@ -36,6 +36,7 @@ func newRouter(a *api) http.Handler {
 
 	router.Use(loggingMiddleware)
 	router.HandleFunc("/test", a.test).Methods(http.MethodGet)
+	router.HandleFunc("/resolve/{domain_name}", a.handleResolve).Methods(http.MethodGet)
 
 	return router
 }
@@ -48,20 +49,34 @@ func loggingMiddleware(inner http.Handler) http.Handler {
 	})
 }
 
+func (a *api) domainName(r *http.Request) string {
+	return mux.Vars(r)["domain_name"]
+}
+
 // test handler
 func (a *api) test(w http.ResponseWriter, r *http.Request) {
-	type hello struct {
-		Msg     string `json:"msg"`
-		TestENS string `json:"test_ens"`
-	}
-	addr, err := a.ens.ResolveTest()
+	testDomain := "hbdgr1234.eth"
+	addr, err := a.ens.Resolve(testDomain)
 	if err != nil {
 		respondWithJSON(w, http.StatusBadRequest, err)
 	}
 
-	h := hello{Msg: "test ens", TestENS: addr}
+	msg := resolveMsg{Name: testDomain, EthAddr: addr}
 
-	respondWithJSON(w, http.StatusOK, h)
+	respondWithJSON(w, http.StatusOK, msg)
+}
+
+func (a *api) handleResolve(w http.ResponseWriter, r *http.Request) {
+	domainName := a.domainName(r)
+
+	addr, err := a.ens.Resolve(domainName)
+	if err != nil {
+		respondWithJSON(w, http.StatusBadRequest, err)
+	}
+
+	msg := resolveMsg{Name: domainName, EthAddr: addr}
+
+	respondWithJSON(w, http.StatusOK, msg)
 }
 
 // helper

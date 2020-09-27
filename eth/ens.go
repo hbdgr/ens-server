@@ -21,15 +21,15 @@ func NewNameService(ethURL string) (*NameService, error) {
 	return &NameService{client: client}, nil
 }
 
-func (e *NameService) ResolveTest() (string, error) {
-	testDomain := "hbdgr1234.eth"
-	address, err := ens.Resolve(e.client, testDomain)
+// Resolve ENS name into Ethereum address
+func (e *NameService) Resolve(name string) (string, error) {
+	address, err := ens.Resolve(e.client, name)
 	if err != nil {
 		return "", nil
 	}
 
 	log.Printf("ENS: Resolved test domain [%s], address: %s",
-		testDomain, address.String())
+		name, address.String())
 
 	return address.String(), nil
 }
