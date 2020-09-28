@@ -1,6 +1,7 @@
 package eth
 
 import (
+	"context"
 	"log"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -18,7 +19,11 @@ func NewNameService(ethURL string) (*NameService, error) {
 	}
 	log.Println("Eth connection ready")
 
-	return &NameService{client: client}, nil
+	ns := &NameService{client: client}
+
+	err = ns.getAllEvents(context.Background())
+
+	return ns, err
 }
 
 // Resolve ENS name into Ethereum address
