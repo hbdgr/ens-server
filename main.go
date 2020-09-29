@@ -19,7 +19,7 @@ func main() {
 	}
 	log.Printf("Config: %#v", cfg) // dbg
 
-	ens, err := eth.NewNameService(cfg.Eth.InfuraURL)
+	ens, err := eth.NewNameService(cfg.Eth.InfuraURL, cfg.Eth.EnsContractAddr)
 	if err != nil {
 		log.Fatal(err)
 	}

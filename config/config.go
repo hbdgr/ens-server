@@ -9,7 +9,8 @@ import (
 type Config struct {
 	Eth struct {
 		// Infura http url
-		InfuraURL string `yaml:"infura_url"`
+		InfuraURL       string `yaml:"infura_url"`
+		EnsContractAddr string `yaml:"ens_contract_addr"`
 	} `yaml:"eth"`
 	Server struct {
 		Host string `yaml:"host"`

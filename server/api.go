@@ -36,7 +36,8 @@ func newRouter(a *api) http.Handler {
 
 	router.Use(loggingMiddleware)
 	router.HandleFunc("/test", a.test).Methods(http.MethodGet)
-	router.HandleFunc("/resolve/{domain_name}", a.handleResolve).Methods(http.MethodGet)
+	router.HandleFunc("/resolve/{name}", a.handleResolve).Methods(http.MethodGet)
+	router.HandleFunc("/reverse-resolve/{address}", a.handleReverseResolve).Methods(http.MethodGet)
 
 	return router
 }
@@ -49,8 +50,12 @@ func loggingMiddleware(inner http.Handler) http.Handler {
 	})
 }
 
-func (a *api) domainName(r *http.Request) string {
-	return mux.Vars(r)["domain_name"]
+func (a *api) name(r *http.Request) string {
+	return mux.Vars(r)["name"]
+}
+
+func (a *api) address(r *http.Request) string {
+	return mux.Vars(r)["address"]
 }
 
 // test handler
@@ -67,14 +72,29 @@ func (a *api) test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) handleResolve(w http.ResponseWriter, r *http.Request) {
-	domainName := a.domainName(r)
+	name := a.name(r)
 
-	addr, err := a.ens.Resolve(domainName)
+	addr, err := a.ens.Resolve(name)
 	if err != nil {
-		respondWithJSON(w, http.StatusBadRequest, err)
+		respondWithJSON(w, http.StatusBadRequest, errorMsg{err.Error()})
+		return
 	}
 
-	msg := resolveMsg{Name: domainName, EthAddr: addr}
+	msg := resolveMsg{Name: name, EthAddr: addr}
+
+	respondWithJSON(w, http.StatusOK, msg)
+}
+
+func (a *api) handleReverseResolve(w http.ResponseWriter, r *http.Request) {
+	address := a.address(r)
+
+	name, err := a.ens.ReverseResolve(address)
+	if err != nil {
+		respondWithJSON(w, http.StatusBadRequest, errorMsg{err.Error()})
+		return
+	}
+
+	msg := resolveMsg{Name: name, EthAddr: address}
 
 	respondWithJSON(w, http.StatusOK, msg)
 }
