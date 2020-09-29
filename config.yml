@@ -1,0 +1,6 @@
+server:
+  host: "127.0.0.1"
+  port: "8000"
+eth:
+  ens_contract_addr: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"
+  infura_url: "wss://goerli.infura.io/SECRET" # goerli
