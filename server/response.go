@@ -1,8 +1,15 @@
 package server
 
 type resolveMsg struct {
-	Name    string `json:"name"`
 	EthAddr string `json:"eth_addr"`
+}
+
+type reverseResolveMsg struct {
+	Name string `json:"name"`
+}
+
+type subdomainsMsg struct {
+	subdomains []string `json:"names"`
 }
 
 type errorMsg struct {

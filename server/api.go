@@ -38,6 +38,8 @@ func newRouter(a *api) http.Handler {
 	router.HandleFunc("/test", a.test).Methods(http.MethodGet)
 	router.HandleFunc("/resolve/{name}", a.handleResolve).Methods(http.MethodGet)
 	router.HandleFunc("/reverse-resolve/{address}", a.handleReverseResolve).Methods(http.MethodGet)
+	router.HandleFunc("/subdomains/{name}", a.handleSubdomains).Methods(http.MethodGet)
+	router.HandleFunc("/subdomains/{name}/info", a.handleSubdomainsInfo).Methods(http.MethodGet)
 
 	return router
 }
@@ -66,7 +68,7 @@ func (a *api) test(w http.ResponseWriter, r *http.Request) {
 		respondWithJSON(w, http.StatusBadRequest, err)
 	}
 
-	msg := resolveMsg{Name: testDomain, EthAddr: addr}
+	msg := resolveMsg{EthAddr: addr}
 
 	respondWithJSON(w, http.StatusOK, msg)
 }
@@ -80,7 +82,7 @@ func (a *api) handleResolve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := resolveMsg{Name: name, EthAddr: addr}
+	msg := resolveMsg{EthAddr: addr}
 
 	respondWithJSON(w, http.StatusOK, msg)
 }
@@ -94,9 +96,33 @@ func (a *api) handleReverseResolve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := resolveMsg{Name: name, EthAddr: address}
+	msg := reverseResolveMsg{Name: name}
 
 	respondWithJSON(w, http.StatusOK, msg)
+}
+
+func (a *api) handleSubdomains(w http.ResponseWriter, r *http.Request) {
+	name := a.name(r)
+
+	subnames, err := a.ens.Subnames(r.Context(), name)
+	if err != nil {
+		respondWithJSON(w, http.StatusBadRequest, errorMsg{err.Error()})
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, subnames)
+}
+
+func (a *api) handleSubdomainsInfo(w http.ResponseWriter, r *http.Request) {
+	name := a.name(r)
+
+	subnamesInfo, err := a.ens.SubnamesInfo(r.Context(), name)
+	if err != nil {
+		respondWithJSON(w, http.StatusBadRequest, errorMsg{err.Error()})
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, subnamesInfo)
 }
 
 // helper
