@@ -1,8 +1,8 @@
-# ens feed
+# Ethereum Name Service (ENS) HTTP server.
 
 ### Clone
 ```sh
-git clone https://github.com/hbdgr/ens_feed
+git clone https://github.com/hbdgr/ens-server
 ```
 
 ### Build
@@ -11,11 +11,7 @@ cd end_feed && go build
 ```
 
 ### Config
-<<<<<<< HEAD
 The defult configuration sets local http server on localhost:8000 and uses Goerli testnet ens contract: `0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e`
-=======
-The defult configuration sets local http server on localhost:8000 and use Goerli testnet ens contract: `0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e`
->>>>>>> 488a9b3 (update readme)
 
 For proper funcioning `InfuraURL` must be provided, both `https` and `wss` work.
 
@@ -56,11 +52,7 @@ curl "http://localhost:8000/reverse-resolve/07CAbC42bE55020ba2E971dA12a53BAE8197
 
 
 # SUBDOMAINS
-<<<<<<< HEAD
-curl "http://localhost:8000/subdomains/hbdgr1234.eth"
-=======
 curl "http://localhost:8000/subdomains/hbdgr1234.eth" | json_reformat
->>>>>>> 488a9b3 (update readme)
 # [
 #     "app.hbdgr1234.eth",
 #     "chain.hbdgr1234.eth",
@@ -69,11 +61,7 @@ curl "http://localhost:8000/subdomains/hbdgr1234.eth" | json_reformat
 
 
 # SUBDOMAINS/INFO
-<<<<<<< HEAD
-curl "http://localhost:8000/subdomains/hbdgr1234.eth/info"
-=======
 curl "http://localhost:8000/subdomains/hbdgr1234.eth/info" | json_reformat
->>>>>>> 488a9b3 (update readme)
 # {
 #     "parent_name": "hbdgr1234.eth",
 #     "subnames": [
@@ -103,11 +91,7 @@ curl "http://localhost:8000/subdomains/hbdgr1234.eth/info" | json_reformat
 # }
 
 # works for nested names
-<<<<<<< HEAD
-curl "http://localhost:8000/subdomains/test5.hbdgr1234.eth/info"
-=======
 curl "http://localhost:8000/subdomains/test5.hbdgr1234.eth/info" | json_reformat
->>>>>>> 488a9b3 (update readme)
 # {
 #     "parent_name": "test5.hbdgr1234.eth",
 #     "subnames": [
@@ -132,11 +116,7 @@ curl "http://localhost:8000/subdomains/test5.hbdgr1234.eth/info" | json_reformat
 
 ## Notes
 
-<<<<<<< HEAD
-* Not every subdomain can be reverse-resolved. In fact by default (in `app.ens.domains`) they can't. Reverse-resolver must be set for having this ability, e.g. with transaction to `ReverseRegistrar` function:  
-=======
-* Not every subdomain can be reverse-resolved. In fact by default (in `app.ens.domains`) they can't. To have this ability, reverse-resolver must be set. It can be acomplished e.g. with transaction to `ReverseRegistrar` function:  
->>>>>>> 488a9b3 (update readme)
+* Not every subdomain can be reverse-resolved. In fact by default (in `app.ens.domains`) they can't. To have this ability, reverse-resolver must be set. It can be acomplished e.g. with transaction to `ReverseRegistrar` function:
 doc: [https://docs.ens.domains/contract-api-reference/reverseregistrar#set-name](https://docs.ens.domains/contract-api-reference/reverseregistrar#set-name)
 ```
 Function: setName(string name)
